@@ -5,35 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Updown - Upload e Download de Arquivos</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
-        main {
-            padding: 20px;
-        }
-        form {
-            margin-top: 20px;
-        }
-        input[type="file"] {
-            margin-bottom: 10px;
-        }
-        footer {
-            background-color: #333;
-            color: #fff;
-            padding: 10px 20px;
-            text-align: center;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
+        /* Estilos CSS */
     </style>
 </head>
 <body>
@@ -48,6 +20,7 @@
                 <button type="button" onclick="uploadFile()">Enviar Arquivo</button>
             </form>
             <p id="uploadStatus"></p>
+            <p id="downloadLink"></p>
         </section>
     </main>
     <footer>
@@ -58,26 +31,31 @@
         function uploadFile() {
             var fileInput = document.getElementById("fileToUpload");
             var uploadStatus = document.getElementById("uploadStatus");
+            var downloadLink = document.getElementById("downloadLink");
 
             if (fileInput.files.length > 0) {
                 var file = fileInput.files[0];
                 var formData = new FormData();
-                formData.append("file", file);
+                formData.append("fileToUpload", file);
 
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", "upload.php", true);
-                xhr.onload = function () {
-                    if (xhr.status == 200) {
-                        var response = JSON.parse(xhr.responseText);
-                        uploadStatus.innerHTML = "Seu arquivo foi enviado com sucesso. <a href='" + response.downloadLink + "'>Clique aqui</a> para fazer o download.";
-                    } else {
-                        uploadStatus.innerHTML = "Desculpe, houve um erro ao enviar seu arquivo.";
-                    }
-                };
                 xhr.upload.onprogress = function (event) {
                     if (event.lengthComputable) {
                         var percentComplete = (event.loaded / event.total) * 100;
                         uploadStatus.innerHTML = "Enviando arquivo... " + percentComplete.toFixed(0) + "%";
+                    }
+                };
+                xhr.onload = function () {
+                    if (xhr.status == 200) {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.downloadLink) {
+                            downloadLink.innerHTML = "Seu arquivo foi enviado com sucesso. <a href='" + response.downloadLink + "'>Clique aqui</a> para fazer o download.";
+                        } else {
+                            uploadStatus.innerHTML = "Desculpe, houve um erro ao processar o arquivo.";
+                        }
+                    } else {
+                        uploadStatus.innerHTML = "Desculpe, houve um erro ao enviar o arquivo.";
                     }
                 };
                 xhr.send(formData);
