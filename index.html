@@ -1,68 +1,85 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Updown - Upload e Download de Arquivos</title>
-    <style>
-        /* Estilos CSS */
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Online</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-window {
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      padding: 20px;
+    }
+
+    #chat {
+      height: 300px;
+      overflow-y: scroll;
+      margin-bottom: 10px;
+    }
+
+    #message-input {
+      width: calc(100% - 70px);
+      padding: 10px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+      margin-right: 10px;
+    }
+
+    #send-button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Bem-vindo ao Updown!</h1>
-    </header>
-    <main>
-        <section>
-            <h2>Enviar Arquivo</h2>
-            <form id="uploadForm" enctype="multipart/form-data">
-                <input type="file" id="fileToUpload" name="fileToUpload">
-                <button type="button" onclick="uploadFile()">Enviar Arquivo</button>
-            </form>
-            <p id="uploadStatus"></p>
-            <p id="downloadLink"></p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2024 Updown. Todos os direitos reservados.</p>
-    </footer>
+  <div class="container">
+    <div class="chat-window">
+      <div id="chat"></div>
+      <input type="text" id="message-input" placeholder="Digite sua mensagem...">
+      <button id="send-button">Enviar</button>
+    </div>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const chatDiv = document.getElementById("chat");
+      const messageInput = document.getElementById("message-input");
+      const sendButton = document.getElementById("send-button");
 
-    <script>
-        function uploadFile() {
-            var fileInput = document.getElementById("fileToUpload");
-            var uploadStatus = document.getElementById("uploadStatus");
-            var downloadLink = document.getElementById("downloadLink");
-
-            if (fileInput.files.length > 0) {
-                var file = fileInput.files[0];
-                var formData = new FormData();
-                formData.append("fileToUpload", file);
-
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "upload.php", true);
-                xhr.upload.onprogress = function (event) {
-                    if (event.lengthComputable) {
-                        var percentComplete = (event.loaded / event.total) * 100;
-                        uploadStatus.innerHTML = "Enviando arquivo... " + percentComplete.toFixed(0) + "%";
-                    }
-                };
-                xhr.onload = function () {
-                    if (xhr.status == 200) {
-                        var response = JSON.parse(xhr.responseText);
-                        if (response.downloadLink) {
-                            downloadLink.innerHTML = "Seu arquivo foi enviado com sucesso. <a href='" + response.downloadLink + "'>Clique aqui</a> para fazer o download.";
-                        } else {
-                            uploadStatus.innerHTML = "Desculpe, houve um erro ao processar o arquivo.";
-                        }
-                    } else {
-                        uploadStatus.innerHTML = "Desculpe, houve um erro ao enviar o arquivo.";
-                    }
-                };
-                xhr.send(formData);
-            } else {
-                uploadStatus.innerHTML = "Por favor, selecione um arquivo para enviar.";
-            }
+      sendButton.addEventListener("click", function() {
+        const message = messageInput.value.trim();
+        if (message !== "") {
+          appendMessage("Você", message);
+          messageInput.value = "";
         }
-    </script>
+      });
+
+      function appendMessage(sender, message) {
+        const messageElement = document.createElement("div");
+        messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+        chatDiv.appendChild(messageElement);
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      }
+    });
+  </script>
 </body>
 </html>
