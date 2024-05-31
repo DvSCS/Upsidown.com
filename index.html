@@ -49,14 +49,33 @@
       border-radius: 3px;
       cursor: pointer;
     }
+
+    #room-code {
+      margin-bottom: 20px;
+    }
+
+    #enter-room-button {
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="chat-window">
+      <div id="room-code">
+        Código da Sala: <span id="room-code-text"></span>
+      </div>
+      <button id="generate-room-button">Gerar Código da Sala</button>
       <div id="chat"></div>
       <input type="text" id="message-input" placeholder="Digite sua mensagem...">
       <button id="send-button">Enviar</button>
+      <br>
+      <button id="enter-room-button">Entrar na Sala</button>
     </div>
   </div>
   <script>
@@ -64,6 +83,14 @@
       const chatDiv = document.getElementById("chat");
       const messageInput = document.getElementById("message-input");
       const sendButton = document.getElementById("send-button");
+      const roomCodeText = document.getElementById("room-code-text");
+
+      let roomCode = "";
+
+      document.getElementById("generate-room-button").addEventListener("click", function() {
+        roomCode = generateRoomCode();
+        roomCodeText.textContent = roomCode;
+      });
 
       sendButton.addEventListener("click", function() {
         const message = messageInput.value.trim();
@@ -73,11 +100,30 @@
         }
       });
 
+      document.getElementById("enter-room-button").addEventListener("click", function() {
+        if (roomCode !== "") {
+          // Redirecionar para a sala com o código
+          window.location.href = "sala.html?room=" + roomCode;
+        } else {
+          alert("Por favor, gere um código de sala primeiro.");
+        }
+      });
+
       function appendMessage(sender, message) {
         const messageElement = document.createElement("div");
         messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
         chatDiv.appendChild(messageElement);
         chatDiv.scrollTop = chatDiv.scrollHeight;
+      }
+
+      function generateRoomCode() {
+        // Gerar um código de sala aleatório
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let code = "";
+        for (let i = 0; i < 6; i++) {
+          code += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return code;
       }
     });
   </script>
